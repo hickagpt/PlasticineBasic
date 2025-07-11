@@ -42,6 +42,9 @@
         private readonly Dictionary<int, int> _lineIndex = new();
         private int _currentIndex;
         private ProgramNode _program;
+        private Stack<int> callStack = new Stack<int>();
+
+        private Stack<LoopContext> loopStack = new();
 
         #endregion Private Fields
 
@@ -141,8 +144,65 @@
                     }
                     break;
 
+                case GosubStatement gosubStatement:
+                    callStack.Push(_currentIndex);
+                    if (_lineIndex.TryGetValue(gosubStatement.LineNumber, out var subIndex))
+                    {
+                        _currentIndex = subIndex - 1; // -1 because it will be incremented after this call
+                    }
+                    else
+                    {
+                        throw new Exception($"GOSUB target line {gosubStatement.LineNumber} not found.");
+                    }
+                    break;
+
+                case ReturnStatement returnStatement:
+                    if (callStack.Count > 0)
+                    {
+                        _currentIndex = callStack.Pop();
+                    }
+                    else
+                    {
+                        throw new Exception("Return called without a matching GOSUB.");
+                    }
+                    break;
+
                 case EndStatement endStatement:
                     _context.IsRunning = false;
+                    break;
+
+                case ForStatement forStmt:
+                    var start = Convert.ToDouble(EvaluateExpression(forStmt.Start));
+                    var end = Convert.ToDouble(EvaluateExpression(forStmt.End));
+                    var step = forStmt.Step != null ? Convert.ToDouble(EvaluateExpression(forStmt.Step)) : 1.0;
+                    _context.Variables[forStmt.VariableName] = start;
+                    loopStack.Push(new LoopContext
+                    {
+                        VariableName = forStmt.VariableName,
+                        EndValue = end,
+                        StepValue = step,
+                        ForIndex = _currentIndex
+                    });
+                    break;
+
+                case NextStatement nextStmt:
+                    if (loopStack.Count == 0)
+                        throw new Exception("NEXT without FOR");
+                    var loop = loopStack.Peek();
+                    if (loop.VariableName != nextStmt.VariableName)
+                        throw new Exception($"NEXT variable '{nextStmt.VariableName}' does not match FOR variable '{loop.VariableName}'");
+                    var current = Convert.ToDouble(_context.Variables[loop.VariableName]);
+                    current += loop.StepValue;
+                    _context.Variables[loop.VariableName] = current;
+                    if ((loop.StepValue > 0 && current <= loop.EndValue) ||
+                        (loop.StepValue < 0 && current >= loop.EndValue))
+                    {
+                        _currentIndex = loop.ForIndex; // Loop again
+                    }
+                    else
+                    {
+                        loopStack.Pop(); // Loop finished
+                    }
                     break;
 
                 default:
@@ -151,5 +211,23 @@
         }
 
         #endregion Private Methods
+
+        #region Private Classes
+
+        private class LoopContext
+        {
+            #region Public Fields
+
+            public double EndValue;
+            public int ForIndex;
+            public double StepValue;
+            public string VariableName;
+
+            #endregion Public Fields
+
+            // Index in the statement list where the FOR is
+        }
+
+        #endregion Private Classes
     }
 }

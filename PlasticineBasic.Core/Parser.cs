@@ -14,6 +14,15 @@
         #endregion Public Properties
     }
 
+    public class GosubStatement : StatementNode
+    {
+        #region Public Properties
+
+        public int LineNumber { get; set; }
+
+        #endregion Public Properties
+    }
+
     public class Parser
     {
         #region Public Constructors
@@ -249,6 +258,25 @@
             {
                 stmt = ParseGoto();
             }
+            else if (Peek().Type == TokenType.Return)
+            {
+                _position++;  // consume RETURN
+                stmt = new ReturnStatement();
+            }
+            else if (Peek().Type == TokenType.EndOfLine)
+            {
+                _position++;  // consume END OF LINE
+                return null; // skip empty lines
+            }
+            else if (Peek().Type == TokenType.Gosub)
+            {
+                _position++;  // consume GOSUB
+                if (Peek().Type != TokenType.NumberLiteral)
+                    throw Error(Peek(), "Expected line number after GOSUB");
+                int lineNumberGosub = int.Parse(Peek().Value);
+                _position++;  // consume line number
+                stmt = new GosubStatement { LineNumber = lineNumberGosub };
+            }
             else if (Peek().Type == TokenType.Input)
             {
                 _position++;  // consume INPUT
@@ -257,13 +285,53 @@
                 {
                     if (Peek().Type != TokenType.Identifier)
                         throw Error(Peek(), "Expected variable name after INPUT");
+
                     inputStatement.Variables.Add(new VariableReference { Name = Peek().Value });
                     _position++;  // consume identifier
+
                     if (Match(TokenType.Comma))
                         continue; // allow comma-separated variables
+
                     break; // exit loop on non-comma
                 }
                 stmt = inputStatement;
+            }
+            else if (Peek().Type == TokenType.For)
+            {
+                _position++; // consume FOR
+                var varToken = Peek();
+                if (varToken.Type != TokenType.Identifier)
+                    throw Error(varToken, "Expected variable name after FOR");
+                _position++; // consume variable
+
+                if (!Match(TokenType.Assign))
+                    throw Error(Peek(), "Expected '=' after variable name");
+
+                var startExpr = ParseExpression();
+                if (!Match(TokenType.To))
+                    throw Error(Peek(), "Expected TO after start expression");
+
+                var endExpr = ParseExpression();
+                ExpressionNode stepExpr = null;
+                if (Match(TokenType.Step))
+                    stepExpr = ParseExpression();
+
+                return new ForStatement
+                {
+                    VariableName = varToken.Value,
+                    Start = startExpr,
+                    End = endExpr,
+                    Step = stepExpr
+                };
+            }
+            else if (Peek().Type == TokenType.Next)
+            {
+                _position++; // consume NEXT
+                var varToken = Peek();
+                if (varToken.Type != TokenType.Identifier)
+                    throw Error(varToken, "Expected variable name after NEXT");
+                _position++; // consume variable
+                return new NextStatement { VariableName = varToken.Value };
             }
             else if (Peek().Type == TokenType.End)
             {
@@ -293,5 +361,9 @@
         }
 
         #endregion Private Methods
+    }
+
+    public class ReturnStatement : StatementNode
+    {
     }
 }
