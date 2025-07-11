@@ -19,6 +19,7 @@
         Let,             // LET A = 10
 
         Print,           // PRINT "Hello"
+        PrintLine,
         Input,           // INPUT A
         If,              // IF A = 1 THEN ...
         Then,            // THEN keyword

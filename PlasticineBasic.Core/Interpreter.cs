@@ -4,8 +4,13 @@
     {
         #region Public Constructors
 
-        public Interpreter()
+        public Interpreter(bool verbose)
         {
+            _verbose = verbose;
+            if (verbose)
+            {
+                Console.WriteLine("Interpreter initialized in verbose mode.");
+            }
             _context = new ExecutionContext();
         }
 
@@ -47,6 +52,7 @@
         private readonly Dictionary<int, int> _lineIndex = new();
         private int _currentIndex;
         private ProgramNode _program;
+        private bool _verbose;
         private Stack<int> callStack = new Stack<int>();
 
         private Stack<LoopContext> loopStack = new();
@@ -147,6 +153,13 @@
 
                 case PrintStatement print:
                     foreach (var expr in print.Values)
+                    {
+                        Console.Write(EvaluateExpression(expr));
+                    }
+                    break;
+
+                case PrintLineStatement printLine:
+                    foreach (var expr in printLine.Values)
                     {
                         Console.Write(EvaluateExpression(expr));
                     }

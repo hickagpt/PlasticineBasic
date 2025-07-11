@@ -13,8 +13,9 @@
     {
         #region Public Constructors
 
-        public Parser(List<Token> tokens)
+        public Parser(List<Token> tokens, bool verbose)
         {
+            _verbose = verbose;
             _tokens = tokens;
         }
 
@@ -45,8 +46,8 @@
         #region Private Fields
 
         private int _position;
-
         private List<Token> _tokens;
+        private bool _verbose;
 
         #endregion Private Fields
 
@@ -84,7 +85,9 @@
 
         private ExpressionNode ParseExpression(int parentPrecedence = 0)
         {
-            Console.WriteLine($"ParseExpression at token {_position}: {Peek().Type} '{Peek().Value}'");
+            if (_verbose)
+                Console.WriteLine($"ParseExpression at token {_position}: {Peek().Type} '{Peek().Value}'");
+
             ExpressionNode left = ParsePrimary();
 
             while (true)
@@ -95,7 +98,9 @@
                 if (precedence == 0 || precedence <= parentPrecedence)
                     break;
 
-                Console.WriteLine($"Consuming operator '{current.Value}' at position {_position}");
+                if (_verbose)
+                    Console.WriteLine($"Consuming operator '{current.Value}' at position {_position}");
+
                 _position++; // consume operator
                 var op = current;
 
@@ -108,7 +113,9 @@
                 };
             }
 
-            Console.WriteLine($"Returning expression at position {_position}");
+            if (_verbose)
+                Console.WriteLine($"Returning expression at position {_position}");
+
             return left;
         }
 
@@ -212,11 +219,28 @@
             return printStatement;
         }
 
+        private StatementNode ParsePrintLine()
+        {
+            var printStatement = new PrintLineStatement();
+            do
+            {
+                SkipEndOfLine(); // Just in case
+                if (IsAtEnd() || Peek().Type == TokenType.EndOfLine || Peek().Type == TokenType.EndOfFile)
+                    break;
+                var expr = ParseExpression();
+                printStatement.Values.Add(expr);
+            } while (Match(TokenType.Comma)); // Allow multiple expressions
+            return printStatement;
+        }
+
         private StatementNode ParseStatement()
         {
             SkipEndOfLine();
 
-            Console.WriteLine($"Parsing statement at token: {_tokens[_position].Type} ('{_tokens[_position].Value}') at position {_position}");
+            if (_verbose)
+            {
+                Console.WriteLine($"Parsing statement at token: {_tokens[_position].Type} ('{_tokens[_position].Value}') at position {_position}");
+            }
 
             int? lineNumber = null;
             if ((Peek().Type == TokenType.LineNumber || Peek().Type == TokenType.NumberLiteral) && int.TryParse(Peek().Value, out var label))
@@ -235,6 +259,11 @@
             {
                 _position++;  // consume PRINT
                 stmt = ParsePrint();
+            }
+            else if (Peek().Type == TokenType.PrintLine)
+            {
+                _position++;  // consume PRINT
+                stmt = ParsePrintLine();
             }
             else if (Peek().Type == TokenType.If)
             {

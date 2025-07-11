@@ -13,13 +13,13 @@ CommandLine.Parser.Default.ParseArguments<Options>(args)
 
         var sourceCode = File.ReadAllText(options.SourceFile);
 
-        var tokeniser = new Tokeniser(sourceCode);
+        var tokeniser = new Tokeniser(sourceCode, options.Verbose);
         var tokens = tokeniser.Tokenise();
         var tokensString = string.Join(Environment.NewLine, tokens.Select(t => $"{t.Type} - {t.Value} at {t.Line}:{t.Column}"));
 
-        var parser = new PlasticineBasic.Core.Parser(tokens);
+        var parser = new PlasticineBasic.Core.Parser(tokens, options.Verbose);
         var program = parser.Parse();
-        var interpreter = new Interpreter();
+        var interpreter = new Interpreter(options.Verbose);
 
         try
         {

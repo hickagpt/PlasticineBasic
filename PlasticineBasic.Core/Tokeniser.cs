@@ -4,7 +4,7 @@
     {
         #region Public Constructors
 
-        public Tokeniser(string source)
+        public Tokeniser(string source, bool verbose)
         {
             _source = source.Replace("\r\n", "\n"); // Normalize line endings
             _position = 0;
@@ -231,6 +231,7 @@
             {
                 "LET" => TokenType.Let,
                 "PRINT" => TokenType.Print,
+                "PRINTL" => TokenType.PrintLine,
                 "INPUT" => TokenType.Input,
                 "IF" => TokenType.If,
                 "THEN" => TokenType.Then,
