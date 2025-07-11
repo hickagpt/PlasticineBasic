@@ -88,7 +88,34 @@
                     }
                     throw new InterpreterTypeException($"Operator '{bin.Operator}' requires numeric operands, got {left?.GetType().Name} and {right?.GetType().Name}");
 
-                // ... handle comparisons similarly
+                // --- Add these cases for comparisons ---
+                case ">":
+                    if (left is double lgt && right is double rgt)
+                        return lgt > rgt;
+                    throw new InterpreterTypeException($"Operator '>' requires numeric operands, got {left?.GetType().Name} and {right?.GetType().Name}");
+
+                case "<":
+                    if (left is double llt && right is double rlt)
+                        return llt < rlt;
+                    throw new InterpreterTypeException($"Operator '<' requires numeric operands, got {left?.GetType().Name} and {right?.GetType().Name}");
+
+                case ">=":
+                    if (left is double lge && right is double rge)
+                        return lge >= rge;
+                    throw new InterpreterTypeException($"Operator '>=' requires numeric operands, got {left?.GetType().Name} and {right?.GetType().Name}");
+
+                case "<=":
+                    if (left is double lle && right is double rle)
+                        return lle <= rle;
+                    throw new InterpreterTypeException($"Operator '<=' requires numeric operands, got {left?.GetType().Name} and {right?.GetType().Name}");
+
+                case "=":
+                    return Equals(left, right);
+
+                case "<>":
+                    return !Equals(left, right);
+
+                // ---------------------------------------
 
                 default:
                     throw new InterpreterTypeException($"Unknown binary operator '{bin.Operator}'");
