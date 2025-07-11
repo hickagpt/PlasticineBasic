@@ -1,13 +1,18 @@
 ﻿0 INPUT x
 10 INPUT y
+
 20 LET z = x + y
 21 LET t = "The sum of x and y is: " + z
+
 30 IF z > 2 THEN GOSUB 100
 40 IF z < 3 THEN GOSUB 200
+
 110 PRINTL t
+
 50 FOR i = 1 TO z
 60 PRINT "*"
 70 NEXT i
+
 80 END
 
 100 PRINTL "The sum is greater than 2"

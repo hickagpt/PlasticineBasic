@@ -3,7 +3,6 @@
     public enum TokenType
     {
         // === Special ===
-        LineNUmber,
 
         EndOfLine,       // Line break or end of statement separator
 
@@ -18,8 +17,9 @@
         // === Keywords ===
         Let,             // LET A = 10
 
+        Random,
         Print,           // PRINT "Hello"
-        PrintLine,
+        PrintLine,       // RAND A
         Input,           // INPUT A
         If,              // IF A = 1 THEN ...
         Then,            // THEN keyword

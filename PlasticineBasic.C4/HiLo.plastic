@@ -1,0 +1,21 @@
+﻿0 RAND secret
+1 LET secret = secret + 1
+10 PRINTL "I'm thinking of a number between 1 and 10."
+
+20 INPUT guess
+30 IF guess = "" THEN GOTO 20
+40 IF guess < secret THEN GOTO 250
+50 IF guess > secret THEN GOTO 200
+60 GOTO 100
+
+100 PRINTL "Correct! The number was " + secret
+110 PRINTL "Congratulations!"
+120 GOTO 1000
+
+200 PRINTL "Too High!"
+210 GOTO 20
+
+250 PRINTL "Too Low!"
+260 GOTO 20
+
+1000 END

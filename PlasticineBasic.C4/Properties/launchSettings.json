@@ -2,7 +2,7 @@
   "profiles": {
     "PlasticineBasic.C4": {
       "commandName": "Project",
-      "commandLineArgs": "-f \"Test.plastic\""
+      "commandLineArgs": "-f \"HiLo.plastic\""
     }
   }
 }
