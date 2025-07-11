@@ -261,6 +261,13 @@ namespace PlasticineBasic.Core
                 _position++;  // consume LET
                 stmt = ParseLet();
             }
+            else if (Peek().Type == TokenType.Rem)
+            {
+                _position++;
+                var comment = new CommentStatement { Text = Peek().Value };
+                _position++;  // consume comment text
+                stmt = comment;
+            }
             else if (Peek().Type == TokenType.Random)
             {
                 _position++;  // consume RANDOM
