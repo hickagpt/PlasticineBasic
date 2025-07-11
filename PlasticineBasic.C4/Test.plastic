@@ -1,5 +1,5 @@
-﻿0 LET x = 1
-10 LET y = 1
+﻿0 INPUT x
+10 INPUT y
 20 LET z = x + y
 21 LET t = "The sum of x and y is: " + z
 30 IF z > 2 THEN

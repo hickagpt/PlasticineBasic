@@ -249,6 +249,22 @@
             {
                 stmt = ParseGoto();
             }
+            else if (Peek().Type == TokenType.Input)
+            {
+                _position++;  // consume INPUT
+                var inputStatement = new InputStatement();
+                while (!IsAtEnd() && Peek().Type != TokenType.EndOfLine && Peek().Type != TokenType.EndOfFile)
+                {
+                    if (Peek().Type != TokenType.Identifier)
+                        throw Error(Peek(), "Expected variable name after INPUT");
+                    inputStatement.Variables.Add(new VariableReference { Name = Peek().Value });
+                    _position++;  // consume identifier
+                    if (Match(TokenType.Comma))
+                        continue; // allow comma-separated variables
+                    break; // exit loop on non-comma
+                }
+                stmt = inputStatement;
+            }
             else if (Peek().Type == TokenType.End)
             {
                 _position++;  // consume END

@@ -124,6 +124,23 @@
                         ExecuteStatement(ifStmt.ThenBranch);
                     break;
 
+                case InputStatement inputStmt:
+
+                    foreach (var variable in inputStmt.Variables)
+                    {
+                        Console.Write($"Enter value for {variable.Name}: ");
+                        var input = Console.ReadLine();
+                        if (double.TryParse(input, out var number))
+                        {
+                            _context.Variables[variable.Name] = number;
+                        }
+                        else
+                        {
+                            _context.Variables[variable.Name] = input; // Store as string if not a number
+                        }
+                    }
+                    break;
+
                 case EndStatement endStatement:
                     _context.IsRunning = false;
                     break;
