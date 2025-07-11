@@ -2,20 +2,41 @@
 1 LET secret = secret + 1
 10 PRINTL "I'm thinking of a number between 1 and 10."
 
-20 INPUT guess
+20 FGCOLOR White
+25 INPUT guess
+
 30 IF guess = "" THEN GOTO 20
-40 IF guess < secret THEN GOTO 250
-50 IF guess > secret THEN GOTO 200
-60 GOTO 100
+40 IF guess = 0 THEN GOTO 300
+50 IF guess < 1 THEN GOTO 300
+60 IF guess > 10 THEN GOTO 300
+70 IF guess < secret THEN GOTO 250
+80 IF guess > secret THEN GOTO 200
+90 IF guess = secret THEN GOTO 100
 
-100 PRINTL "Correct! The number was " + secret
+100 FGCOLOR Green
+105 PRINTL "Correct! The number was " + secret
 110 PRINTL "Congratulations!"
-120 GOTO 1000
+120 PRINTL "Would you like to play again? (Y/N)"
+120 INPUT playAgain
+130 IF playAgain = "" THEN GOTO 120
+140 IF playAgain = "Y" THEN GOTO 1
+150 IF playAgain = "y" THEN GOTO 1
+160 IF playAgain = "N" THEN GOTO 1000
+170 IF playAgain = "n" THEN GOTO 1000
+180 PRINTL "Invalid input. Please enter Y or N."
+120 GOTO 120
 
-200 PRINTL "Too High!"
+200 FGCOLOR Red
+205 PRINTL "Too High!"
 210 GOTO 20
 
-250 PRINTL "Too Low!"
+250 FGCOLOR Red
+255 PRINTL "Too Low!"
 260 GOTO 20
 
-1000 END
+300 FGCOLOR Yellow
+305 PRINTL "Invalid input. Please enter a number between 1 and 10."
+310 GOTO 20
+
+1000 FGCOLOR White
+1005 END

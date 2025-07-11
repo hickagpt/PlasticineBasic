@@ -1,4 +1,6 @@
-﻿namespace PlasticineBasic.Core
+﻿using System.Drawing;
+
+namespace PlasticineBasic.Core
 {
     public class GosubStatement : StatementNode
     {
@@ -323,6 +325,30 @@
                     break; // exit loop on non-comma
                 }
                 stmt = inputStatement;
+            }
+            else if (Peek().Type == TokenType.SetForegroundColor)
+            {
+                _position++;
+                if (Peek().Type != TokenType.Identifier)
+                    throw Error(Peek(), "Expected color name after SET FOREGROUND COLOR");
+                var colorToken = Peek();
+                _position++; // consume color name
+                stmt = new SetForegroundColorStatement
+                {
+                    Color = Color.FromName(colorToken.Value)
+                };
+            }
+            else if (Peek().Type == TokenType.SetBackgroundColor)
+            {
+                _position++;
+                if (Peek().Type != TokenType.Identifier)
+                    throw Error(Peek(), "Expected color name after SET BACKGROUND COLOR");
+                var colorToken = Peek();
+                _position++; // consume color name
+                stmt = new SetBackgroundColorStatement
+                {
+                    Color = Color.FromName(colorToken.Value)
+                };
             }
             else if (Peek().Type == TokenType.For)
             {

@@ -251,6 +251,8 @@
                 "DEF" => TokenType.Def,
                 "FN" => TokenType.Fn,
                 "SUB" => TokenType.Sub,
+                "FGCOLOR" => TokenType.SetForegroundColor,
+                "BGCOLOR" => TokenType.SetBackgroundColor,
                 _ => TokenType.Identifier
             };
             _tokens.Add(new Token(type, value, _line, start + 1));

@@ -2,8 +2,6 @@
 using CommandLine;
 using PlasticineBasic.Core;
 
-Console.WriteLine("Hello, World!");
-
 CommandLine.Parser.Default.ParseArguments<Options>(args)
     .WithParsed(options =>
     {

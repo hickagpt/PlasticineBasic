@@ -20,6 +20,8 @@
         Random,
         Print,           // PRINT "Hello"
         PrintLine,       // RAND A
+        SetForegroundColor, // FGCOLOR 4
+        SetBackgroundColor, // BGCOLOR 2
         Input,           // INPUT A
         If,              // IF A = 1 THEN ...
         Then,            // THEN keyword
