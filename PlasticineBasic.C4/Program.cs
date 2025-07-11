@@ -21,18 +21,7 @@ CommandLine.Parser.Default.ParseArguments<Options>(args)
         var program = parser.Parse();
         var interpreter = new Interpreter(options.Verbose);
 
-        try
-        {
-            interpreter.Execute(program);
-        }
-        catch (InterpreterTypeException ex)
-        {
-            Console.WriteLine($"Type Error: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Runtime Error: {ex.Message}");
-        }
+        interpreter.Execute(program);
     })
     .WithNotParsed(errors =>
     {

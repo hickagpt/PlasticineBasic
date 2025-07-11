@@ -57,6 +57,8 @@
 
         private Stack<LoopContext> loopStack = new();
 
+        private Random random = new Random();
+
         #endregion Private Fields
 
         #region Private Methods
@@ -73,6 +75,13 @@
                         return $"{left}{right}";
                     if (left is double lNum && right is double rNum)
                         return lNum + rNum;
+                    if (left is int lInt && right is int rInt)
+                        return lInt + rInt;
+                    if (left is double lDbl && right is int rInt2)
+                        return lDbl + rInt2;
+                    if (left is int lInt2 && right is double rDbl)
+                        return lInt2 + rDbl;
+
                     throw new InterpreterTypeException($"Cannot add types {left?.GetType().Name} and {right?.GetType().Name}");
 
                 case "-":
@@ -164,6 +173,16 @@
                         Console.Write(EvaluateExpression(expr));
                     }
                     Console.WriteLine();
+                    break;
+
+                case RandomStatement randomStmt:
+                    if (randomStmt.VariableName == null)
+                    {
+                        throw new Exception("RANDOM statement must assign to a variable.");
+                    }
+                    var randomValue = random.NextDouble() * 10;
+
+                    _context.Variables[randomStmt.VariableName] = (int)randomValue;
                     break;
 
                 case GotoStatement gotoStmt:

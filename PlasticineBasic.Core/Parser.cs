@@ -13,7 +13,7 @@
     {
         #region Public Constructors
 
-        public Parser(List<Token> tokens, bool verbose)
+        public Parser(List<Token> tokens, bool verbose = false)
         {
             _verbose = verbose;
             _tokens = tokens;
@@ -65,7 +65,8 @@
                 TokenType.Power => 4,
                 TokenType.Multiply or TokenType.Divide or TokenType.Modulus => 3,
                 TokenType.Plus or TokenType.Minus => 2,
-                TokenType.Equal or TokenType.NotEqual or TokenType.LessThan or TokenType.LessThanOrEqual or TokenType.GreaterThan or TokenType.GreaterThanOrEqual => 1,
+                // Add TokenType.Assign here:
+                TokenType.Equal or TokenType.Assign or TokenType.NotEqual or TokenType.LessThan or TokenType.LessThanOrEqual or TokenType.GreaterThan or TokenType.GreaterThanOrEqual => 1,
                 _ => 0
             };
         }
@@ -105,10 +106,13 @@
                 var op = current;
 
                 ExpressionNode right = ParseExpression(precedence);
+                string opValue = op.Value;
+                if (op.Type == TokenType.Assign || op.Type == TokenType.Equal)
+                    opValue = "=";
                 left = new BinaryExpression
                 {
                     Left = left,
-                    Operator = op.Value,
+                    Operator = opValue,
                     Right = right
                 };
             }
@@ -255,6 +259,15 @@
                 _position++;  // consume LET
                 stmt = ParseLet();
             }
+            else if (Peek().Type == TokenType.Random)
+            {
+                _position++;  // consume RANDOM
+                if (Peek().Type != TokenType.Identifier)
+                    throw Error(Peek(), "Expected variable name after RANDOM");
+                var variableName = Peek().Value;
+                _position++;  // consume identifier
+                stmt = new RandomStatement { VariableName = variableName };
+            }
             else if (Peek().Type == TokenType.Print)
             {
                 _position++;  // consume PRINT
@@ -376,9 +389,5 @@
         }
 
         #endregion Private Methods
-    }
-
-    public class ReturnStatement : StatementNode
-    {
     }
 }

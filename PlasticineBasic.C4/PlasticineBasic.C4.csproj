@@ -16,6 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="HiLo.plastic">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Test.plastic">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
