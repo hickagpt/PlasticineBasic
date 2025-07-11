@@ -175,6 +175,30 @@
                     Console.WriteLine();
                     break;
 
+                case SetBackgroundColorStatement setBgColor:
+                    if (setBgColor.Color == null)
+                    {
+                        throw new Exception("SET BACKGROUND COLOR statement must specify a color.");
+                    }
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"Setting background color to {setBgColor.Color}");
+                    }
+                    Console.BackgroundColor = setBgColor.AsConsoleColor();
+                    break;
+
+                case SetForegroundColorStatement setFgColor:
+                    if (setFgColor.Color == null)
+                    {
+                        throw new Exception("SET FOREGROUND COLOR statement must specify a color.");
+                    }
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"Setting foreground color to {setFgColor.Color}");
+                    }
+                    Console.ForegroundColor = setFgColor.AsConsoleColor();
+                    break;
+
                 case RandomStatement randomStmt:
                     if (randomStmt.VariableName == null)
                     {
