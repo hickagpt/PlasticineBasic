@@ -155,6 +155,10 @@
         {
             switch (stmt)
             {
+                case CommentStatement _:
+                    // Comments are ignored
+                    break;
+
                 case LetStatement let:
                     var value = EvaluateExpression(let.Expression);
                     _context.Variables[let.VariableName] = value;

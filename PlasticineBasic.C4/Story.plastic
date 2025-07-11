@@ -1,0 +1,35 @@
+﻿0 REM "Story Generator"
+10 REM "This program generates a simple story based on user input"
+20 PRINTL "Welcome to the Story Generator!"
+
+30 PRINT "Please enter a character name:"
+40 INPUT characterName
+50 PRINT "Please enter a setting:"
+60 INPUT setting
+70 PRINT "Please enter a conflict:"
+80 INPUT conflict
+90 PRINT "Please enter a resolution:"
+100 INPUT resolution
+
+110 PRINTL "Here is your story:"
+
+120 PRINTL "Once upon a time, in " + setting + ", there lived a character named " + characterName + "."
+130 PRINTL "One day, " + characterName + " faced a conflict: " + conflict + "."
+140 PRINTL "After much thought, " + characterName + " found a resolution: " + resolution + "."
+150 PRINTL "And they lived happily ever after."
+
+160 PRINTL "Thank you for using the Story Generator!"
+
+170 PRINTL "Would you like to generate another story? (Y/N)"
+180 INPUT playAgain
+190 IF playAgain = "" THEN GOTO 170
+200 IF playAgain = "Y" THEN GOTO 20
+210 IF playAgain = "y" THEN GOTO 20
+220 IF playAgain = "N" THEN GOTO 1000
+230 IF playAgain = "n" THEN GOTO 1000
+240 PRINTL "Invalid input. Please enter Y or N."
+250 GOTO 170
+
+1000 FGCOLOR White
+1005 PRINTL "Goodbye!"
+1010 END
