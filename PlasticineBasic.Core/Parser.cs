@@ -1,24 +1,10 @@
 ﻿namespace PlasticineBasic.Core
 {
-    public class EndStatement : StatementNode
-    {
-    }
-
-    public class ExecutionContext
-    {
-        #region Public Properties
-
-        public bool IsRunning { get; set; } = true;
-        public Dictionary<string, object> Variables { get; } = new();
-
-        #endregion Public Properties
-    }
-
     public class GosubStatement : StatementNode
     {
         #region Public Properties
 
-        public int LineNumber { get; set; }
+        public int TargetLineNumber { get; set; }
 
         #endregion Public Properties
     }
@@ -136,7 +122,7 @@
                 throw Error(Peek(), "Expected line number after GOTO");
             int lineNumber = int.Parse(Peek().Value);
             _position++; // Consume line number
-            return new GotoStatement { LineNumber = lineNumber };
+            return new GotoStatement { TargetLineNumber = lineNumber };
         }
 
         private StatementNode ParseIf()
@@ -275,7 +261,7 @@
                     throw Error(Peek(), "Expected line number after GOSUB");
                 int lineNumberGosub = int.Parse(Peek().Value);
                 _position++;  // consume line number
-                stmt = new GosubStatement { LineNumber = lineNumberGosub };
+                stmt = new GosubStatement { TargetLineNumber = lineNumberGosub };
             }
             else if (Peek().Type == TokenType.Input)
             {

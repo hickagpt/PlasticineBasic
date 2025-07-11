@@ -1,9 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using CommandLine;
+using PlasticineBasic.Core;
 
 Console.WriteLine("Hello, World!");
 
-Parser.Default.ParseArguments<Options>(args)
+CommandLine.Parser.Default.ParseArguments<Options>(args)
     .WithParsed(options =>
     {
         // Here you would typically process the options
@@ -12,13 +13,26 @@ Parser.Default.ParseArguments<Options>(args)
 
         var sourceCode = File.ReadAllText(options.SourceFile);
 
-        var tokeniser = new PlasticineBasic.Core.Tokeniser(sourceCode);
+        var tokeniser = new Tokeniser(sourceCode);
         var tokens = tokeniser.Tokenise();
         var tokensString = string.Join(Environment.NewLine, tokens.Select(t => $"{t.Type} - {t.Value} at {t.Line}:{t.Column}"));
+
         var parser = new PlasticineBasic.Core.Parser(tokens);
         var program = parser.Parse();
-        var interpreter = new PlasticineBasic.Core.Interpreter();
-        interpreter.Execute(program);
+        var interpreter = new Interpreter();
+
+        try
+        {
+            interpreter.Execute(program);
+        }
+        catch (InterpreterTypeException ex)
+        {
+            Console.WriteLine($"Type Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Runtime Error: {ex.Message}");
+        }
     })
     .WithNotParsed(errors =>
     {

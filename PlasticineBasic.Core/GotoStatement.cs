@@ -4,7 +4,7 @@
     {
         #region Public Properties
 
-        public int LineNumber { get; set; }
+        public int TargetLineNumber { get; set; }
 
         #endregion Public Properties
     }

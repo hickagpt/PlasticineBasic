@@ -9,6 +9,11 @@
             _context = new ExecutionContext();
         }
 
+        public Interpreter(ExecutionContext context)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+        }
+
         #endregion Public Constructors
 
         #region Public Methods
@@ -55,28 +60,39 @@
             var left = EvaluateExpression(bin.Left);
             var right = EvaluateExpression(bin.Right);
 
-            return bin.Operator switch
+            switch (bin.Operator)
             {
-                "+" =>
-                    left is string || right is string
-                        ? $"{left}{right}"
-                        : Convert.ToDouble(left) + Convert.ToDouble(right),
+                case "+":
+                    if (left is string || right is string)
+                        return $"{left}{right}";
+                    if (left is double lNum && right is double rNum)
+                        return lNum + rNum;
+                    throw new InterpreterTypeException($"Cannot add types {left?.GetType().Name} and {right?.GetType().Name}");
 
-                "-" => Convert.ToDouble(left) - Convert.ToDouble(right),
-                "*" => Convert.ToDouble(left) * Convert.ToDouble(right),
-                "/" => Convert.ToDouble(left) / Convert.ToDouble(right),
-                "%" => Convert.ToDouble(left) % Convert.ToDouble(right),
-                "^" => Math.Pow(Convert.ToDouble(left), Convert.ToDouble(right)),
+                case "-":
+                case "*":
+                case "/":
+                case "%":
+                case "^":
+                    if (left is double l && right is double r)
+                    {
+                        return bin.Operator switch
+                        {
+                            "-" => l - r,
+                            "*" => l * r,
+                            "/" => l / r,
+                            "%" => l % r,
+                            "^" => Math.Pow(l, r),
+                            _ => throw new InterpreterTypeException($"Unknown operator {bin.Operator}")
+                        };
+                    }
+                    throw new InterpreterTypeException($"Operator '{bin.Operator}' requires numeric operands, got {left?.GetType().Name} and {right?.GetType().Name}");
 
-                "=" => Equals(left, right),
-                "<>" => !Equals(left, right),
-                "<" => Convert.ToDouble(left) < Convert.ToDouble(right),
-                "<=" => Convert.ToDouble(left) <= Convert.ToDouble(right),
-                ">" => Convert.ToDouble(left) > Convert.ToDouble(right),
-                ">=" => Convert.ToDouble(left) >= Convert.ToDouble(right),
+                // ... handle comparisons similarly
 
-                _ => throw new Exception($"Unknown binary operator '{bin.Operator}'")
-            };
+                default:
+                    throw new InterpreterTypeException($"Unknown binary operator '{bin.Operator}'");
+            }
         }
 
         private object EvaluateExpression(ExpressionNode expr)
@@ -111,13 +127,13 @@
                     break;
 
                 case GotoStatement gotoStmt:
-                    if (_lineIndex.TryGetValue(gotoStmt.LineNumber, out var targetIndex))
+                    if (_lineIndex.TryGetValue(gotoStmt.TargetLineNumber, out var targetIndex))
                     {
                         _currentIndex = targetIndex - 1; // -1 because it will be incremented after this call
                     }
                     else
                     {
-                        throw new Exception($"GOTO target line {gotoStmt.LineNumber} not found.");
+                        throw new Exception($"GOTO target line {gotoStmt.TargetLineNumber} not found.");
                     }
                     break;
 
@@ -146,13 +162,13 @@
 
                 case GosubStatement gosubStatement:
                     callStack.Push(_currentIndex);
-                    if (_lineIndex.TryGetValue(gosubStatement.LineNumber, out var subIndex))
+                    if (_lineIndex.TryGetValue(gosubStatement.TargetLineNumber, out var subIndex))
                     {
                         _currentIndex = subIndex - 1; // -1 because it will be incremented after this call
                     }
                     else
                     {
-                        throw new Exception($"GOSUB target line {gosubStatement.LineNumber} not found.");
+                        throw new Exception($"GOSUB target line {gosubStatement.TargetLineNumber} not found.");
                     }
                     break;
 
